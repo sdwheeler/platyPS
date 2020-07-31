@@ -830,19 +830,49 @@ function New-ExternalHelp
         {
             Function Write-Progress() {}
         }
+
+        function GetAboutTextNoYAML {
+            param(
+                [string]$path
+            )
+
+            $doc = Get-Content $path -Encoding UTF8
+            $start = $end = -1
+
+            # search the first 30 lines for the Yaml header
+            # no yaml header in our docset will ever be that long
+
+            for ($x = 0; $x -lt 30; $x++) {
+                if ($doc[$x] -eq '---') {
+                    if ($start -eq -1) {
+                        $start = $x
+                    }
+                    else {
+                        if ($end -eq -1) {
+                            $end = $x + 1
+                            break
+                        }
+                    }
+                }
+            }
+            if ($end -gt $start) {
+                Write-Output ($doc[$end..$($doc.count)] -join "`r`n")
+            }
+            else {
+                Write-Output ($doc -join "`r`n")
+            }
+        }
+
     }
 
     process
     {
         $MarkdownFiles += GetMarkdownFilesFromPath $Path
 
-        if($MarkdownFiles)
+        $aboutPath = Join-Path $Path 'About'
+        if(Test-Path $aboutPath)
         {
-            $AboutFiles += GetAboutTopicsFromPath -Path $Path -MarkDownFilesAlreadyFound $MarkdownFiles.FullName
-        }
-        else
-        {
-            $AboutFiles += GetAboutTopicsFromPath -Path $Path
+            $AboutFiles += Get-ChildItem $aboutPath -Filter 'about_*.md'
         }
     }
 
@@ -913,18 +943,23 @@ function New-ExternalHelp
 
          # handle about topics
          if ($AboutFiles.Count -gt 0) {
-            foreach ($About in $AboutFiles) {
-               $r = New-Object -TypeName 'Markdown.MAML.Renderer.TextRenderer' -ArgumentList($MaxAboutWidth)
-               $Content = Get-Content -Raw $About.FullName
-               $p = NewMarkdownParser
-               $model = $p.ParseString($Content)
-               $value = $r.AboutMarkDownToString($model)
 
-               $outPath = Join-Path $OutputPath ([io.path]::GetFileNameWithoutExtension($About.FullName) + ".help.txt")
-               if (!(Split-Path -Leaf $outPath).ToUpper().StartsWith("ABOUT_", $true, $null)) {
-                  $outPath = Join-Path (Split-Path -Parent $outPath) ("about_" + (Split-Path -Leaf $outPath))
-               }
-               MySetContent -Path $outPath -Value $value -Encoding $Encoding -Force:$Force
+            $exe = Get-Command pandoc.exe -ErrorAction Stop
+            $pandocExePath = $exe.Source
+
+            foreach ($About in $AboutFiles) {
+               $aboutFileFullName = $About.FullName
+               $aboutFileOutputName = "$($About.BaseName).help.txt"
+               $aboutFileOutputFullName = Join-Path $OutputPath $aboutFileOutputName
+
+               $pandocArgs = @(
+                   "--from=gfm",
+                   "--to=plain+multiline_tables",
+                   "--columns=75",
+                   "--output=$aboutFileOutputFullName",
+                   "--quiet"
+               )
+               GetAboutTextNoYAML $aboutFileFullName | & $pandocExePath $pandocArgs
             }
          }
        }
