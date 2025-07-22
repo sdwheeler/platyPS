@@ -1,7 +1,8 @@
 ---
 external help file: platyPS-help.xml
 Module Name: platyPS
-online version: https://github.com/PowerShell/platyPS/blob/master/docs/New-MarkdownAboutHelp.md
+ms.date: 03/16/2021
+online version: https://github.com/PowerShell/platyPS/tree/v1/docs/platyPS/New-MarkdownAboutHelp.md
 schema: 2.0.0
 ---
 
@@ -17,9 +18,10 @@ New-MarkdownAboutHelp [-OutputFolder] <String> [[-AboutName] <String>] [<CommonP
 ```
 
 ## DESCRIPTION
-The **New-MarkdownAboutHelp** cmdlet generates a Markdown file that is prepopulated with the standard elements of an About Topic.
+
+The `New-MarkdownAboutHelp` cmdlet generates a Markdown file that is prepopulated with the standard elements of an About Topic.
 The cmdlet copies the template MD, renames headers and file name according to the **AboutName** parameter,
-and deposits the file in the directory designated by the **OutputFoler** parameter.
+and deposits the file in the directory designated by the **OutputFolder** parameter.
 
 The About Topic can be converted to Txt format.
 About topics must be in txt format or the PowerShell Help engine will not be able to parse the document.
@@ -28,8 +30,9 @@ Use the [New-ExternalHelp](New-ExternalHelp.md) cmdlet to convert About Topic ma
 ## EXAMPLES
 
 ### Example 1
-```
-PS C:\> New-MarkdownAboutHelp -OutputFolder C:\Test -AboutName
+
+```powershell
+PS C:\> New-MarkdownAboutHelp -OutputFolder C:\Test -AboutName TestAboutTopic
 PS C:\> Get-ChildItem C:\Test
 
     Directory: C:\Test
@@ -37,13 +40,14 @@ PS C:\> Get-ChildItem C:\Test
 
 Mode                LastWriteTime         Length Name
 ----                -------------         ------ ----
--a----        7/13/2016   2:12 PM           1491 TestAboutTopic.md
+-a----        7/13/2016   2:12 PM           1491 about_TestAboutTopic.md
 ```
 
 Create and display file info for PowerShell About Topic Markdown File.
 
 ### Example 2
-```
+
+```powershell
 PS C:\> New-ExternalHelp -Path C:\Test\ -OutputPath C:\Test
 
 
@@ -52,7 +56,7 @@ PS C:\> New-ExternalHelp -Path C:\Test\ -OutputPath C:\Test
 
 Mode                LastWriteTime         Length Name
 ----                -------------         ------ ----
--a----        7/13/2016   2:15 PM           1550 TestAboutTopic.txt
+-a----        7/13/2016   2:15 PM           1550 about_TestAboutTopic.help.txt
 ```
 
 Create PowerShell About Topic Txt file from existing Markdown About file.
@@ -60,6 +64,7 @@ Create PowerShell About Topic Txt file from existing Markdown About file.
 ## PARAMETERS
 
 ### -AboutName
+
 The name of the about topic.
 
 ```yaml
@@ -75,6 +80,7 @@ Accept wildcard characters: False
 ```
 
 ### -OutputFolder
+
 The directory to create the about topic in.
 
 ```yaml
@@ -90,7 +96,11 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose,
+-WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -99,9 +109,11 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## OUTPUTS
 
 ### System.Object
+
 This cmdlet returns a object for created files.
 
 ## NOTES
+
 The about topics will need to be added to a cab file to leverage updatable help.
 
 ## RELATED LINKS
