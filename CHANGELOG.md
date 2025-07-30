@@ -1,237 +1,109 @@
-CHANGELOG
--------------
+# CHANGELOG for Microsoft.PowerShell.PlatyPS
+
+## v1.0.1
 
-## Not released
+- Fix MAML to support online help (#791)
 
-# 0.14.1
+## v1.0.0 GA release
 
-- Fix appveyor build script
-  - Update-Help for selected modules only
-  - Pin Pester to version 4.10.1
-- Add makecab directive to set size limit to `CDROM`
+- Update version to be 1.0.0 by removing prerelease (#786)
 
-# 0.14.0
+## v1.0.0-rc3
 
-* Fix passing `ExcludeDontShow` flag to modules (#459)
-* Make `CommonParameters` text use proper link format (#449)
-* Modified `GetSchemaVersion` function to assume `2.0.0` if no schema version found (#452)
-* Fix errors for `New-MarkdownHelp` `ps1` input (#450)
+- Ensure all the metadata is added to CommandHelp (#784)
 
-# 0.13.0
+## v1.0.0-rc2
 
-* Fix `Update-MarkdownHelp` to not rewrite files if there are not updates (#412) (Thanks @iricigor)
-* Add `-ModulePagePath` parameter to `New-MarkdownHelp` for better placement of generated file (#416) (Thanks @PrzemyslawKlys)
-* Remove doubled blank lines and trailing spaces in docs (#425) (Thanks @it-praktyk)
-* Add Localized Data support for strings in `platyPS.psm1` (#426) (Thanks @tnieto88)
-* Add tags to module manifest to improve search on gallery (#428) (Thanks @it-praktyk)
-* Fix `Update-MarkdownHelp` to respect order of parameters (#423) (Thanks @it-praktyk)
-* Fix `Update-MarkdownHelpModule` to respect `-Force` parameter (#438) (Thanks @it-praktyk)
-* Fix for Common and Workflow parameters autowrap (#431) (Thanks @PrzemyslawKlys)
-* Do not generate help content for parameters with `DontShow` attribute if `-ExlcudeDontShow` switch is used (#445) (Thanks @MiYanni)
+- Add HelpInfoUri to support Updateable help (#778)
+- Update the constant WhatIf description (#780)
+- Update the line break character to main spacing in MAML (#781)
+- Ensure external help file from metadata is used for generating the MAML file name (#779)
+- Follow pascal casing on -AbbreviateParameterTypename parameter (#715)
+- Do not append template if parameter description exists (#783)
 
-## 0.12.0
+Repo management
 
-* Include proper escaping handing for `\*` and `\_` (#398)
-* Update YamlDotNet dependency to 5.0.0 (CVE-2018-1000210)
-* Add New-ExternalHelpCab File Type Check (#403)
-* Add `Update-MarkdownHelpModule -ModulePagePath` parameter (#397)
+- Rename `master` branch to `v1`
+- Rename `v2` branch to `main`
+- Reorganize main branch contents (#761)
 
-## 0.11.1
+## v1.0.0-rc1
 
-* Fix the incorrect metadata retrieval for the single parameter sets in remote sessions (#399).
+- Add alias for LiteralPath parameter for all cmdlets (#767)
+- Confirm and WhatIf parameters should have constant descriptions (#768)
+- Description should be empty when it is missing in ModuleFile (#769)
+- Add line breaks in MAML for examples content (#770)
 
-## 0.11.0
+- Update CI and release pipeline for branch name changes (#766)
+- Update dependencies to latest patch version (#771)
 
-* Add default descriptions for paging parameters (#392).
-* Fix `yaml` new-line bug (#381).
-* Add `-UpdateInputOutput` parameter (#383).
-* Add `-UseFullName` parameter to Update-MarkdownHelpModule (#380)
+## v1.0.0-preview5
 
-## 0.10.2
+- Allow front matter metadata to have list of Aliases (#730)
+- Remove unnecessary HelpUri parameter from New-MarkdownModuleFile and `Update-MarkdownModuleFile`
+  cmdlets (#740)
+- Fix example parsing when there no parameters on the command (#741)
+- MAML conversion uses the function name as Verb and empty string as noun (#742)
+- Restore brackets to type for collection (#739)
+- Use double quotes in YAML if text contains single quote (#749)
+- Get the description from comment-based help for input and output (#750)
+- Update the parameter description in markdown when comment based help is updated (#752)
+- Remove nullable from typename for inputs and outputs (#753)
+- Ensure the next header after description is examples while parsing MD (#755)
+- Parse the multiline metadata correctly (#756)
+- Ensure NULL string value is written as quoted string in YAML (#759)
 
-* Fix remote module support to work correctly with parameter sets with no parameters.
+## v1.0.0-preview4
 
-## 0.10.1
+This was an internal release for build pipeline changes.
 
-* Fix remote module support for PowerShell version 3.0 and 4.0.
-* Avoid doubling `about_` when user provide it in the `AboutName` parameter.
+## [v1.0.0-preview3](https://github.com/PowerShell/platyPS/releases/tag/v1.0.0-preview.3)
 
-## 0.10.0
+- Fix export when the file does not exist already (#726)
 
-* Add basic deduplication for Examples in `Merge-MarkdownHelp` [#331](https://github.com/PowerShell/platyPS/issues/331)
-* Support for remote modules. Pass `-Session` parameter in supported cmdlets to retrieve accurate metadata from the remote session.
-* The ShowProgress parameter was added to the New-ExternalHelp function. By default progress bars are not display to increase speed of files processing.
+## [v1.0.0-preview.2](https://github.com/PowerShell/platyPS/releases/tag/v1.0.0-preview.2)
 
-## 0.9.0
+Code changes
 
-* platyPS is now cross platform and works on powershell 6.0 as well as previous versions of powershell.
+- New-MarkdownHelp implementation for v2 (#520)
+- Initial code for Update-MarkdownCommandHelp (#657)
+- Various bug fixes for New-MarkdownHelp and Get-MarkdownMetadata cmdlets (#549)
+- Fix generic type name to avoid ` in type names (#556)
+- Resolve the assembly conflict that could be caused by PlatyPS (#587)
+- Fix the loader to work on PowerShell 7.0 too (.NET 3.1) (#588)
+- Update build script test to have better isolation (#608)
+- Add alias tracking to object model. (#609)
+- Remove unnecessary xUnit tests (#617)
+- Add IEquatable to commandhelp object model (#620)
+- make CommandHelp public (#621)
+- Add Export-MamlCommandHelp (#623)
+- add diagnostics for markdown parsing (#624)
+- Updates for Syntax. (#626)
+- Update to new schema. (#628)
+- Change the module name to Microsoft.PowerShell.PlatyPS (#629)
+- Implement the module file reader (#630)
+- Add the module file cmdlets (#633)
+- More tests for the OPS release (#634)
+- Fixes for Export-YamlModuleFile (#635)
+- new-markdownhelp (#638)
+- Fix input/output transformation from cmdlet. (#641)
+- Change object model for ModuleFile (#658)
+- Ensure empty descriptions notes, inputs, outputs and links create an accurate YAML (#720)
+- Make parameters alias to be lists instead of strings (#722)
 
-## 0.8.4
+Docs improvements
 
-* Clean up trailing whitespace during markdown generation [#225](https://github.com/PowerShell/platyPS/issues/225)
-* Preserve line breaks after headers when `Update-MarkdownHelp` is used [#319](https://github.com/PowerShell/platyPS/issues/319)
-* MAML generation now pads example titles with dash (-) to improve readability [#119](https://github.com/PowerShell/platyPS/issues/119)
-* Fixed issue with `New-MarkdownHelp` preventing CommonParameter being added for advanced functions and workflows [#223](https://github.com/PowerShell/platyPS/issues/223) [#253](https://github.com/PowerShell/platyPS/issues/253)
-* Fixed issue with `Update-MarkdownHelp` removing named info-string from code fence [#318](https://github.com/PowerShell/platyPS/issues/318)
+- Updated cmdlet reference for new cmdlets
+- Added documentation for a new markdown schema
+- Added JSON schemas for platyPS v0.14 and new v1.0 markdown
+- Defined new metadata to be supported in v1.0 markdown
 
-## 0.8.3
+Repo management
 
-* New-ExternalHelp support 'about' help topics. (Thanks @jazzdelightsme)
-* Improve first build experience. (Thanks @jazzdelightsme)
-* Fixed spellings and casing in developer notes. (Thanks @DarqueWarrior)
-* Added ErrorLogFile parameter to New-ExternalHelp cmdlet. (Thanks @DarqueWarrior)
-* Added -MaxAboutWidth parameter to New-ExternalHelp cmdlet. (Thanks @jazzdelightsme)
-* Use ToString to get full type name for parameters. (Thanks @yishengjin1413)
+- Pipeline changes for publishing to the powershell gallery (#701)
+- Update release version for v1.0.0-preview2 from v2.0.0-preview1
 
-## 0.8.2
+## v2.0.0-preview1
 
-* Help content for Merge-MarkdownHelp is updated.
-* Added New-YamlHelp cmdlet to convert Markdown help into YAML format.
-
-## 0.8.1
-
-* New-MarkdownHelp and Update-MarkdownHelp now support -UseFullTypeName parameter.
-* MamlRenderer now uses XLinq to serialize MAML rather than a Stack and a StringBuilder.
-* Bugfixes for Merge-MarkdownHelp:
-  - Sort tags alphabetically
-  - Fix -ExplicitApplicableIfAll to work as expected
-
-## 0.8.0
-
-* Removing the auto increment of help version [#269](https://github.com/PowerShell/platyPS/issues/269)
-* Schema version v1 is not longer supported. Update-MarkdownHelpSchema cmdlet removed.
-* Enhanced error reporting for New-ExternalHelp [#270](https://github.com/PowerShell/platyPS/issues/270)
-* New schema feature: applicable tag [#273](https://github.com/PowerShell/platyPS/issues/273)
-  - You can now combine different version / flavours of the same cmdlet into a single markdown file.
-  - Applicable entry in yaml metadata controls what is applicable for each module on two levels: cmdlet and parameter.
-  - New cmdlet [Merge-MarkdownHelp](https://github.com/PowerShell/platyPS/blob/master/docs/Merge-MarkdownHelp.md)
-* Fix WildcardSupport for -Path parameter for multiply comments in our help.
-
-## 0.7.6
-
-* Updated artifact name to 0.7.6
-
-## 0.7.5
-
-* Updated New-ExternalHelpCab.md for removing duplicate word in synopsis.
-* Fixed XML_PREAMBULA to have msh namespace, so provider help works.
-* Updated the names of the generated cab and zip files so that they have correct case sensitivity.
-
-## 0.7.4
-
-* Add path to md file to the error message [Issue #237](https://github.com/PowerShell/platyPS/issues/237)
-* Allow multiple code snippets in the examples
-* Allow schema to have non-yaml codesnippets in the Parameter as part of Description [Issue #239](https://github.com/PowerShell/platyPS/issues/239)
-
-## 0.7.3
-
-* Fix about topic naming pattern [Issue #235](https://github.com/PowerShell/platyPS/issues/235)
-
-## 0.7.2
-
-* Enhanced Logging and Error trapping for Update Scenarios [Issue #214](https://github.com/PowerShell/platyPS/issues/214)
-
-## 0.7.1
-
-* Improve blank-line padding in `New-MarkdownHelp` and `Update-MarkdownHelp`. [Issue #210](https://github.com/PowerShell/platyPS/issues/210)
-* Auto-generate default descriptions for `-Confirm` and `-WhatIf` parameters in `New-MarkdownHelp`. [Issue #211](https://github.com/PowerShell/platyPS/issues/211)
-
-## 0.7.0
-
-#### New
-* Update markdown parser to handle underscore version of italics and bold [Issue #176](https://github.com/PowerShell/platyPS/issues/176)
-* Cab creation the help version metadata is incremented prior to cabbing. IE: 1.0.0.0 -> 1.0.0.1
-* Update markdown will now check the external help file name and update to correct value.
-* Update-MarkdownHelpModule new switch -RefreshModulePage, update the module page with cmdlet synopsis and preserves the module description field.
-* Add -AlphabeticParamsOrder parameter to `New-MarkdownHelp`, `Update-MarkdownHelp` and `New-MarkdownHelpModule`.
-  When specified orders parameters alphabetically by name in PARAMETERS section.
-
-#### Bug Fixes
-* Resolved issue where about topic second header was case sensitive. Now insensitive. [Issue #174](https://github.com/PowerShell/platyPS/issues/174)
-* About topics will be named with about_<Topic Name> when converted to txt using New-ExternalHelp. Enhancement suggested in [Issue #174](https://github.com/PowerShell/platyPS/issues/174)
-* If PowerShell session is in a non-file system provider, PlatyPS will switch to a file system provider. Preference C: drive. [Issue #161](https://github.com/PowerShell/platyPS/issues/161)
-* Updates to Pester-Tests to fix issues occuring when updatable-help changes
-* Default parameter values should be 'none' not 'false' [Issue #167](https://github.com/PowerShell/platyPS/issues/167)
-* Updated New-MarkdownAboutHelp to name the about file about_<AboutTopicName>.md instead of <AboutTopicName>.md. [Issue #177](https://github.com/PowerShell/PlatyPS/issues/177)
-
-## 0.6.1
-
-#### New
-* Forcing metadata in md files to be sorted alphabetically by key.
-
-## 0.6.0
-
-#### New
-* About Topics Support
-  - New Cmdlet New-MarkdownAboutHelp generates a MD of a blank about topic MD file from a template file.
-  - The About MD file template can be customized. The template is stored in the templates folder in PlatyPS
-  - New-ExternalHelp will now transform About MD files into About Txt files.
-
-#### Bug Fixes
-* Update-MarkdownHelp Log updated to improve readability.
-* You can use relative file paths for related links now. [#164](https://github.com/PowerShell/platyPS/issues/164)
-
-## 0.5.0
-
-This release focuses on stability and usability.
-Special thanks to [@TimShererAtAquent](https://github.com/TimShererAtAquent) for the thoughful feedback.
-
-#### New
-* normalize all the things:
-  - casing in the parameters metadata section [#122](https://github.com/PowerShell/platyPS/issues/122)
-    (i.e. `Accepts pipeline input: true` -> `Accepts pipeline input: True`)
-  - Em-dashes, smart quotes are replaced by regular ones [#127](https://github.com/PowerShell/platyPS/issues/127)
-  - Unicode whitespaces [#113](https://github.com/PowerShell/platyPS/issues/113)
-* Enhance your help to leverage markdown:
-  - `New-MarkdownHelp -ConvertNotesToList` creates bullet list for NOTES section. [#125](https://github.com/PowerShell/platyPS/issues/125)
-  - `New-MarkdownHelp -ConvertDoubleDashLists` turns you double-dash lists into markdown-compatible single-dash lists. [#117](https://github.com/PowerShell/platyPS/issues/117)
-* Default parameter set marker in SYNTAX [#107](https://github.com/PowerShell/platyPS/issues/107)
-* Online version (for `Get-Help -Online`) got it's own place in markdown metadata header [#123](https://github.com/PowerShell/platyPS/issues/123)
-* `(` and `)` are not escaped in the generated markdown anymore.
-* If SYNOPSIS not present, generate placeholder for it, instead of a duplicate for SYNTAX [#110](https://github.com/PowerShell/platyPS/issues/110)
-
-#### Bugfixes
-
-* `Update-MarkdownHelp` doesn't add extra-lines anymore.
-* Bold or italic doesn't strip spaces anymore [#130](https://github.com/PowerShell/platyPS/issues/130)
-* `platyPS.psm1` doesn't use aliases anymore [#126](https://github.com/PowerShell/platyPS/issues/126)
-* Parameter `HelpMessage` attribute can be used to generate Parameter description in markdown [#115](https://github.com/PowerShell/platyPS/issues/115)
-* No unwanted markdown files for aliases anymore [#114](https://github.com/PowerShell/platyPS/issues/114)
-
-## 0.4.0
-
-*   Schema 2.0.0
-*   Layout of generated files - one file per cmdlet.
-*   Cmdlets renamed: `platyPS` prefix removed from the names.
-*   Removed APIs:
-    -   `Get-ModuleFromMaml`
-    -   `New-MarkdownHelp` always produces one md file per cmdlet in `-OutputFolder`.
-*   New APIs:
-    -   `New-ExternalHelpCab` - create updatable help Cab files.
-    -   `Get-MarkdownMetadata` - get a hashtable with yaml metadata (new in schema 2.0.0) from the markdown file
-    -   `Update-MarkdownHelp`, `Update-MarkdownHelpModule` - update your markdown with actual parameters metadata using reflection.
-    -   `Update-MarkdowhHelpSchema` - migrate from schema version 1.0.0 to schema version 2.0.0
-    -   `Get-HelpPreview` - get preview of help from Maml file. Returns help objects.
-*   Tab-completion support by [@dotps1](https://github.com/dotps1)
-    -    Requires PS v5 or [TabExpansionPlusPlus](https://github.com/lzybkr/TabExpansionPlusPlus)
-    -    Provides complitions for module names in `New-ExternalHelp -Module <Tab>`
-
-## 0.3.1
-
-*   Fix issue that cause error in CI scenario https://github.com/PowerShell/platyPS/issues/27
-
-## 0.3.0
-
-*   Add Get-PlatyPSTextHelpFromMaml command to simplify resulted help review
-
-## 0.2.0
-
-*   Better support for working with big modules:
-    *   `Get-PlatyPSMarkdown -OneFilePerCommand -OutputFolder`
-    *   `Get-PlatyPSExternalHelp -MarkdownFolder`
-
-## 0.1.0
-
-*   Initial release
-*   Commands: `Get-PlatyPSExternalHelp`, `Get-PlatyPSMarkdown`, `Get-ModuleFromMaml`
-*   Schema: Version 1.0.0
+This was an attempt at creating a new version of platyPS based on the old v0.14 codebase. This
+version was abandoned in favor of a new implementation.

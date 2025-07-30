@@ -1,115 +1,82 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/u65tnar0cfkmqywl/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/markdown-maml/branch/master)
-[![Build status](https://travis-ci.org/PowerShell/platyPS.svg?branch=master)](https://travis-ci.org/PowerShell/platyPS/builds)
+# Microsoft.PowerShell.PlatyPS
 
-[![Join the chat at https://gitter.im/PowerShell/platyPS](https://badges.gitter.im/PowerShell/platyPS.svg)](https://gitter.im/PowerShell/platyPS?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+**PlatyPS** is the tool that Microsoft uses to create the PowerShell content you get from `Get-Help`
+and build the content published as [PowerShell documentation][03] on Microsoft Learn.
 
-# PlatyPS
+PowerShell help files are stored as [Microsoft Assistance Markup Language][05] (MAML), an XML
+format. **PlatyPS** simplifies the authoring process by allowing you to write the help files in
+Markdown, then convert to MAML. [Markdown][04] is widely used in the software industry,
+supported by many editors including **Visual Studio Code**, and easier to author.
 
-PlatyPS provides a way to:
+**Microsoft.PowerShell.PlatyPS** includes several improvements:
 
-* Write PowerShell External Help in Markdown
-* Generate markdown help ([example](docs/Update-MarkdownHelp.md)) for your existing modules
-* Keep markdown help up-to-date with your code
+- Re-write in C# leveraging [markdig][02] for parsing Markdown (the same library used by
+  Microsoft Learn to render Markdown)
+- Provides a more accurate description of a PowerShell cmdlet and its parameters and includes
+  information that was previously unavailable
+- Creates an object model of the help file that you can manipulate and supports chaining cmdlets for
+  complex operations
+- Increased performance - processes 1000s of Markdown files in seconds
 
-Markdown help docs can be generated from old external help files (also known as MAML-xml help), the command objects (reflection), or both.
+## Install Microsoft.PowerShell.PlatyPS
 
-PlatyPS can also generate cab files for [`Update-Help`](https://technet.microsoft.com/en-us/library/hh849720.aspx).
+PlatyPS runs on:
 
-## Why?
+- Windows PowerShell 5.1+
+- PowerShell 7+ on Windows, Linux, and macOS
 
-Traditionally PowerShell external help files have been authored by hand or using complex tool chains and rendered as MAML XML for use as console help.
-MAML is cumbersome to edit by hand, and common tools and editors don't support it for complex scenarios like they do with Markdown. PlatyPS is provided as a solution for allow documenting PowerShell help in any editor or tool that supports Markdown.
-
-An additional challenge PlatyPS tackles, is to handle PowerShell documentation for complex scenarios (e.g. very large, closed source, and/or C#/binary modules) where it may be desirable to have documentation abstracted away from the codebase. PlatyPS does not need source access to generate documentation.
-
-Markdown is designed to be human-readable, without rendering. This makes writing and editing easy and efficient. 
-Many editors support it ([Visual Studio Code](https://code.visualstudio.com/), [Sublime Text](http://www.sublimetext.com/), etc), and many tools and collaboration platforms (GitHub, Visual Studio Online) render the Markdown nicely.
-
-## Common setups
-
-There are 2 common setups that are used:
-
-1. Use markdown as the source of truth and remove other types of help.
-2. Keep comment based help as the source of truth and periodically generate markdown for web-site publishing.
-
-They both have advantages and use-cases, you should decide what's right for you.
-There is slight preference toward number 1 (markdown as the source).
-
-## Quick start
-
-* Install platyPS module from the [PowerShell Gallery](https://powershellgallery.com):
+Install the module from [PSGallery][06].
 
 ```powershell
-Install-Module -Name platyPS -Scope CurrentUser
-Import-Module platyPS
+Install-PSResource -Name Microsoft.PowerShell.PlatyPS
 ```
 
-* Create initial Markdown help for `MyAwesomeModule` module:
+## Layout of this repository
+
+### Branches
+
+- `main`: Contains the source code for the new version of PlatyPS named
+  **Microsoft.PowerShell.PlatyPS**. This is the current supported version of PlatyPS. You can find
+  this version listed as [Microsoft.PowerShell.PlatyPS][06] in the PowerShell Gallery.
+- `v1`: Contains the source code for the legacy version of PlatyPS named **platyPS**. This version
+  is no longer actively maintained, but it's available for reference and legacy support. The latest
+  version of this code is 0.14.2. You can find this version listed as [platyPS][07] in the
+  PowerShell Gallery.
+
+### Folder structure
+
+- `docs` - contains design documentation for the PlatyPS project
+- `src` - contains the source code for the module
+- `test` - contains the tests files used to validate the code at build time
+- `tools` - contains tools used to build the module
+
+## Contributing to the project
+
+If you are interested in contributing to the PlatyPS project, please see the
+[contribution guide][01].
+
+### Build the code
+
+Prerequisites for build:
+
+- PS7
+- .NET 8 SDK
+
+Prerequisites for test:
+
+- Pester 4.x (Pester 5.x is not supported)
+
+To build the source code, run the following command in the root of the repository:
 
 ```powershell
-# you should have module imported in the session
-Import-Module MyAwesomeModule
-New-MarkdownHelp -Module MyAwesomeModule -OutputFolder .\docs
+.\build.ps1 -Clean
 ```
 
-* Edit markdown files in `.\docs` folder and populate `{{ ... }}` placeholders with missed help content.
-
-* Create external help from markdown help
-
-```powershell
-New-ExternalHelp .\docs -OutputPath en-US\
-```
-
-* **Congratulations**, your help is now in markdown!
-
-* Now, if your module code changes, you can easily update your markdown help with
-
-```powershell
-# re-import your module with latest changes
-Import-Module MyAwesomeModule -Force
-Update-MarkdownHelp .\docs
-```
-
-### PlatyPS markdown schema
-
-Unfortunately, you cannot just write any Markdown, as platyPS expects Markdown to be authored in a **particular way**.
-We have defined a [**schema**](platyPS.schema.md) to determine how parameters are described, where scripts examples are shown, and so on.
-
-The schema closely resembles the existing output format of the `Get-Help` cmdlet in PowerShell. 
-
-If you break the schema in your markdown, you will get error messages from `New-ExternalHelp` and `Update-MarkdownHelp`.
-You would not be able to generate extrenal help or update your markdown.
-
-It may be fine for some scenarios, i.e. you want to have online-only version of markdown.
-
-## [Usage](docs)
-
-Supported scenarios:
-
-*  Create Markdown
-    *  Using existing external help files (MAML schema, XML).
-    *  Using reflection
-    *  Using reflection and existing internal external help files.
-    *  For a single cmdlet
-    *  For an entire module
-
-*  Update existing Markdown through reflection.
-
-*  Create a module page <ModuleName>.md with summary. It will also allow you to create updatable help cab.
-
-*  Retrieve markdown metadata from markdown file.
-
-*  Create external help xml files (MAML) from platyPS Markdown.
-
-*  Create external help file cab
-
-*  Preview help from generated maml file.
-
-## Remoting
-
-PlatyPS supports working with [`Import-PSSession`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/import-pssession?view=powershell-6) aka implicit remoting.
-Just pass `-Session $Session` parameter to the platyPS cmdlets and it will do the rest.
-
-## Build
-
-For information about building from sources and contributing see [contributing guidelines](CONTRIBUTING.md).
+<!-- link references -->
+[01]: ./CONTRIBUTING.md
+[02]: https://github.com/xoofx/markdig
+[03]: https://learn.microsoft.com/powershell/scripting
+[04]: https://wikipedia.org/wiki/Markdown
+[05]: https://wikipedia.org/wiki/Microsoft_Assistance_Markup_Language
+[06]: https://www.powershellgallery.com/packages/Microsoft.PowerShell.PlatyPS
+[07]: https://www.powershellgallery.com/packages/platyPS
