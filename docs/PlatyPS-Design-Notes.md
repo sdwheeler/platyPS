@@ -1,14 +1,7 @@
----
-ms.date: 10/22/2024
----
 # Microsoft.PowerShell.PlatyPS design notes
 
-## Design notes
+## Features and functionality
 
-### Features/Functionality
-
-- When PlatyPS writes file output, it should create folder structure of module-named folders
-  containing cmdlet markdown for the cmdlets in those modules
 - PlatyPS should populate the markdown with all the facts that it can reasonably gather about the
   command:
   - Name
@@ -18,59 +11,51 @@ ms.date: 10/22/2024
   - Input types - types that can be piped to the command
   - Output types - as defined by the cmdlet attributes
 - PlatyPS should insert placeholder text for all content that must be provided by the author
+- PlatyPS should not attempt to fill in any content that requires human knowledge or judgment
+  (e.g. descriptions, examples, related links, etc.)
+- PlatyPS should not attempt to validate the content of the markdown files beyond the basic
+  structure of the markdown and the required metadata
+- PlatyPS should provide a method of updating existing markdown with new information about the
+  command (e.g. new parameters, updated descriptions, etc.) without losing the existing content and
+  formatting.
+- PlatyPS should provide a method of converting markdown to other formats: Markdown (new schema),
+  YAML, and MAML.
+- PlatyPS should be able to import markdown files in the old format (v0.14) and convert to any of
+  the supported output formats.
+- PlatyPS commands should work in a pipeline and support chaining.
+- PlatyPS should provider better diagnostics and error messages to help authors troubleshoot issues
+  with the markdown files.
 
-### Module notes
+## Object model
 
-- Total rewrite in C# to improve performance, object model, and extensibility
-  - Cmdlets are focused on the object model and provide a single purpose
-  - Chain cmdlets in a pipeline to perform complex operations
-  - Workflow style cmdlets will be script-based to improve usability for authors
-    - Script-based provide readable code model that allows end-users to customize their own
-      workflows as needed
-    - Workflows are easier to code in script rather than in C#
-- Total breaking change from previous versions
-- New module name - Microsoft.PowerShell.PlatyPS
-  - Allows you to install side-by-side with previous versions
-  - No common cmdlet names between modules
-  - No intent to provide proxies for old cmdlets
-- Cmdlet names better reflect what they do
-  - Import-SomeFormat
-  - Export-SomeFormat
-- New markdown parsing and rendering powered by markdig
-- Module provides Yaml output to be used by the Learn reference pipeline
-- Object model is the heart of the new module
-  - Establishes a common object model for cmdlets and module files
-  - Markdown is the source of truth for the documentation
-  - Cmdlets import the markdown in the the CommandHelp object model
-  - CommandHelp objects can be exported to Markdown, Yaml, or MAML
-  - CommandHelp objects can be imported from Markdown, Yaml, or MAML
-  - Conversion to/from MAML is lower fidelity other formats - results in loss of data and accuracy
-    of the documentation
+The **CommandHelp** object is the heart of the new architecture. The **CommandHelp** object can be
+built from a **CommandInfo** object provided by `Get-Command` or from a supported file format.
 
-### Markdown notes
+### Create CommandHelp object from a CommandInfo object
 
-- Markdown is the source of truth for the documentation
-- Markdown has a strict H2/H3 structure
-  - You can't add headers or reorder them
-  - Not all H2/H3 sections require content. The H2/H3 line is required, but the content is optional.
-    This is done to ensure that the markdown structure is consistent with the object model.
-- Metadata names have been changed to match PowerShell property names and common terminology.
-  - This causes less confusion for authors and makes it easier to troubleshoot validation and
-    rendering issues
-- Import command can read old (0.14) format or new format and converts Markdown into CommandHelp
-  object
-- Export commands convert CommandHelp object into other formats
-  - Export to markdown command can writes new markdown format
-  - Export to Yaml is used by the Learn reference pipeline and reflects the new object model
-  - Export to MAML is lower fidelity and results in loss of data and accuracy of the documentation
-    due to limitation in Get-Help and the MAML specification
-- The Yaml frontmatter is used to store metadata that is not part of the markdown content
-  - The object model has a set of required key/value pairs
-  - The `document type` and `PlatyPS schema version` keys are inviolate (cannot be changed)
-  - You can add custom metadata to the frontmatter
-  - Any key/value pairs not managed by PlatyPS are passed through unaltered
+Creating a **CommandHelp** object from a **CommandInfo** object allows PlatyPS to gather all the
+facts about the command and its parameters, including the input and output types, common parameters,
+and parameter metadata. The **CommandHelp** object has properties for notes, descriptions, examples,
+related links, and metadata. However, those properties are typically empty and must be filled in by
+the author. If the command is script-based, the **CommandHelp** object includes descriptive
+information provided by comment-based help. The comment-based help text is provided by the
+`Get-Help` cmdlet and is used to populate the **CommandHelp** object.
 
-### Authoring process
+### Create CommandHelp object from a file
+
+You can create a **CommandHelp** object by importing cmdlet information from one of the supported
+formats: Markdown (both new and old schema), YAML, or MAML.
+
+When you import from a file, the **CommandHelp** object is populated with the metadata and content
+that is present in the file. PlatyPS doesn't validate the information against the actual command.
+
+### Using the CommandHelp object
+
+After you create a **CommandHelp** object, you can update its properties, add new examples, related
+links, and notes, and then export it to one of the supported formats. You could also create your own
+transformations to convert the **CommandHelp** object to other custom formats.
+
+## Authoring process
 
 - Authoring is always a manual process requiring human intervention
 - PlatyPS helps automate the process and provides a consistent structure for the documentation but
@@ -82,9 +67,34 @@ ms.date: 10/22/2024
   - Migrating existing markdown to the new format
   - Updating existing markdown based on new versions of modules/commands
 
+### Updating existing markdown
+
+You can update existing markdown files using the `Update-MarkdownCommandHelp` command. This command
+adds or updates new information such as: parameter set syntax, new (or previously undocumented)
+parameters, parameter metadata, input and output types, etc. Newly added items include placeholders
+for descriptions.
+
+> [!NOTE]
+> Running `Update-MarkdownCommandHelp` converts the existing markdown file to the new schema format,
+> if it is not already in that format. There is no way to revert the file back to the old format
+> after running this command. The command overwrites the existing markdown file but also creates a
+> backup file with the `.bak` extension.
+
+The update command doesn't remove any existing information such as parameters, input and output
+types, and descriptions. This is intentional. In many cases, the documentation author can provide
+information that isn't available from the command itself. For example:
+
+- Dynamic parameters aren't reliably discoverable
+- Command authors often forget to include the necessary attributes to properly document output
+  information or support for wildcards
+
+This information can be added by the author, so PlatyPS doesn't remove it when updating the
+markdown. Therefore, you must always review the updated markdown files to ensure that the
+information is accurate and complete.
+
 ### Converting to/from other formats
 
-- Markdown is the source of truth for the documentation
+- Markdown is intended to be the source of truth for the documentation
 - Converting from the old Markdown format to the new format is a one-way process
   - The new format has more structure and metadata than the old format
   - The new format is more consistent and easier to validate
@@ -101,7 +111,7 @@ ms.date: 10/22/2024
     values)
 - Converting to/from MAML
   - There is a loss of fidelity when converting to MAML due to limitations in the MAML specification
-    and Get-Help cmdlet
+    and `Get-Help` cmdlet
 - Importing from MAML is supported as a method of last resort.
 
 ## Frontmatter
@@ -126,22 +136,3 @@ ms.date: 10/22/2024
 | module   | ms.date            | Optional                                            | ms.date                | Optional                                           |
 | module   | schema             | Required                                            | PlatyPS schema version | Required                                           |
 | module   | title              | Required                                            | title                  | Required                                           |
-
-## Scenarios to support OPS
-
-1. Workflow script to convert all markdown files to YAML in a folder
-1. Workflow script for CabGen
-1. Make rendering decisions for HTML presentation
-
-These items to be done by Sean and Jason working with DanniX and team.
-
-## Future ideas
-
-- Create a method to convert CommandHelp object to the Get-Help object model
-  - This could be an easy way to ship markdown instead of MAML for downlevel systems that don't have
-    or cant support Help v2.
-- Add commands to stream conversion to Markdown to support Markdown rendering in the console (e.g.
-  pipe to `glow.exe`)
-- Create workflow convenience scripts to include in module
-- Compare-MarkdownCommandHelp - can't compare module files
-
